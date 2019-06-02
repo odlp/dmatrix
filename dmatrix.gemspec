@@ -19,7 +19,12 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "parallel", "~> 1.13"
+  spec.add_dependency "slop", "~> 4.5"
+
   spec.add_development_dependency "bundler"
+  spec.add_development_dependency "jet_black", "~> 0.5"
+  spec.add_development_dependency "pry"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec", "~> 3.8"
 end

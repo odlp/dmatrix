@@ -1,0 +1,5 @@
+matrix:
+  build_arg:
+    FROM_IMAGE:
+      - ruby:2.5-alpine
+      - ruby:2.6-alpine

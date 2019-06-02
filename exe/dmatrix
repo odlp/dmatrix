@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require "slop"
+require "dmatrix"
+
+opts = Slop.parse do |o|
+  o.string "-m", "--matrix", "Matrix file", default: ".matrix.yaml"
+  o.string "--log-dir", "Log directory", default: "tmp/dmatrix"
+  o.on "--version", "Display the version" do
+    puts Dmatrix::VERSION
+    exit 0
+  end
+end
+
+Dmatrix::Runner.new(options: opts.to_hash, run_command: opts.arguments).call

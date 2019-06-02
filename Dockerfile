@@ -1,0 +1,2 @@
+ARG FROM_IMAGE=ruby:2.6-alpine
+FROM $FROM_IMAGE
