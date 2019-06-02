@@ -12,7 +12,7 @@ Inspired by the [Travis Build Matrix](https://docs.travis-ci.com/user/build-matr
 
 ### `.matrix.yaml`
 
-```
+```yaml
 matrix:
   build_arg:
     FROM_IMAGE:
@@ -29,7 +29,7 @@ with the [Appraisal gem](https://github.com/thoughtbot/appraisal).
 
 ### `Dockerfile`
 
-```
+```dockerfile
 ARG FROM_IMAGE=ruby:2.6-alpine
 FROM $FROM_IMAGE
 
@@ -62,15 +62,19 @@ matrix defines.
 
 ## Setup
 
-```
+### Get the gem
+
+```ruby
 # Gemfile
 
 gem "dmatrix"
 ```
 
+### Create a matrix
+
 Create a `.matrix.yaml` file:
 
-```
+```yaml
 matrix:
   build_arg:
     ARG1:
@@ -84,10 +88,14 @@ matrix:
 
 N.B. the `build_arg` and `env` keys can both contain multiple variants.
 
-Run:
+### Adapt your Dockerfile
+
+Wire-up the ARG and ENV variables as required.
+
+### Run
 
 ```
 bundle exec dmatrix -- <your command>
 ```
 
-If not command is specified the default Docker command should run.
+If no command is specified the default Docker command will run.
