@@ -17,7 +17,7 @@ RSpec.describe "dmatrix exit status" do
 
     expect(session.run("bundle exec dmatrix -- ruby -v")).to be_a_failure
 
-    expect(contents_of_first_match("tmp/dmatrix/build*2.99*.log")).
+    expect(contents_of_first_match("tmp/dmatrix/build*2-99*.log")).
       to include "manifest for ruby:2.99-alpine not found"
   end
 
@@ -36,7 +36,7 @@ RSpec.describe "dmatrix exit status" do
 
     expect(session.run("bundle exec dmatrix -- ruby foo")).to be_a_failure
 
-    expect(contents_of_first_match("tmp/dmatrix/run*2.5*.log")).
+    expect(contents_of_first_match("tmp/dmatrix/run*2-5*.log")).
       to include "No such file or directory -- foo"
   end
 

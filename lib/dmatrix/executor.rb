@@ -1,7 +1,11 @@
+require "forwardable"
 require "shellwords"
+require_relative "image_tag"
 
 module Dmatrix
   class Executor
+    extend Forwardable
+
     def initialize(combination:, run_command:, log_dir:, executor: Kernel.method(:system))
       @combination = combination
       @run_command = run_command
@@ -24,6 +28,8 @@ module Dmatrix
 
     attr_reader :combination, :run_command, :log_dir, :executor
 
+    def_delegators :image_tag, :tag
+
     def build
       executor.call("docker build %{build_args} --tag %{tag} . > #{log_path(type: "build")} 2>&1" % build_params)
     end
@@ -44,13 +50,8 @@ module Dmatrix
       }
     end
 
-    def tag
-      combination_tag = combination.aspects.map(&:value).join("-").gsub(/[:\s]/, "-")
-      "#{repo}:#{combination_tag}"
-    end
-
-    def repo
-      File.split(Dir.pwd).last
+    def image_tag
+      @image_tag ||= ImageTag.new(values: combination.aspects.map(&:value))
     end
 
     def build_args
