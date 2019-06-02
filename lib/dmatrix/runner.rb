@@ -3,24 +3,28 @@ require "parallel"
 require "yaml"
 
 require_relative "executor"
+require_relative "logger"
 require_relative "matrix"
 
 module Dmatrix
   class Runner
-    def initialize(options:, run_command:)
+    def initialize(options:, run_command:, logger: Logger.new)
       @options = options
       @run_command = run_command
+      @logger = logger
     end
 
     def call
       reset_log_dir
 
       results = Parallel.map(combinations, in_threads: 4) do |combination|
-        p Executor.new(
+        Executor.new(
           combination: combination,
           run_command: run_command,
           log_dir: log_dir
-        ).build_run
+        ).build_run.tap do |result|
+          logger.log_result(result)
+        end
       end
 
       if results.any?(&:failure?)
@@ -30,7 +34,7 @@ module Dmatrix
 
     private
 
-    attr_reader :options, :run_command
+    attr_reader :options, :run_command, :logger
 
     def combinations
       Matrix.new(input_combinations).combinations
