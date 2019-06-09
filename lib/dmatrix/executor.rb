@@ -1,4 +1,5 @@
 require "forwardable"
+require "open3"
 require "shellwords"
 require_relative "image_tag"
 
@@ -6,11 +7,22 @@ module Dmatrix
   class Executor
     extend Forwardable
 
-    def initialize(combination:, run_command:, log_dir:, executor: Kernel.method(:system))
+    def self.build(combination:, run_command:, log_dir:)
+      new(
+        combination: combination,
+        run_command: run_command,
+        log_dir: log_dir,
+        executor: Open3.method(:capture2e),
+        file_writer: File.method(:write),
+      )
+    end
+
+    def initialize(combination:, run_command:, log_dir:, executor:, file_writer:)
       @combination = combination
       @run_command = run_command
       @log_dir = log_dir
       @executor = executor
+      @file_writer = file_writer
     end
 
     def build_run
@@ -26,28 +38,41 @@ module Dmatrix
 
     private
 
-    attr_reader :combination, :run_command, :log_dir, :executor
+    attr_reader :combination, :run_command, :log_dir, :executor, :file_writer
 
     def_delegators :image_tag, :tag
 
     def build
-      executor.call("docker build %{build_args} --tag %{tag} . > #{log_path(type: "build")} 2>&1" % build_params)
+      output, status = perform_build
+      file_writer.call(log_path(type: "build"), output)
+      status.success?
+    end
+
+    def perform_build
+      executor.call(
+        "docker",
+        "build",
+        *build_args,
+        "--tag",
+        tag,
+        ".",
+      )
     end
 
     def run
-      executor.call("docker run %{env_args} %{tag} %{run_command} > #{log_path(type: "run")} 2>&1" % run_params)
+      output, status = perform_run
+      file_writer.call(log_path(type: "run"), output)
+      status.success?
     end
 
-    def build_params
-      { tag: tag, build_args: build_args }
-    end
-
-    def run_params
-      {
-        tag: tag,
-        env_args: env_args,
-        run_command: formatted_run_command,
-      }
+    def perform_run
+      executor.call(
+        "docker",
+        "run",
+        *env_args,
+        tag,
+        *run_command
+      )
     end
 
     def image_tag
@@ -58,32 +83,24 @@ module Dmatrix
       args = combination.aspects.select { |a| a[:type] == "build_arg" }
 
       if args.empty?
-        return ""
+        return []
       end
 
-      args.map do |build_arg|
-        "--build-arg #{build_arg.name}=#{build_arg.value}"
-      end.join(" ")
+      args.flat_map do |build_arg|
+        ["--build-arg", "#{build_arg.name}=#{build_arg.value}"]
+      end
     end
 
     def env_args
       args = combination.aspects.select { |a| a[:type] == "env" }
 
       if args.empty?
-        return ""
+        return []
       end
 
-      args.map do |env_arg|
-        "--env #{env_arg.name}=#{env_arg.value}"
-      end.join(" ")
-    end
-
-    def formatted_run_command
-      if run_command.nil? || run_command.empty?
-        return ""
+      args.flat_map do |env_arg|
+        ["--env", "#{env_arg.name}=#{env_arg.value}"]
       end
-
-      Shellwords.join(run_command)
     end
 
     def log_path(type:)

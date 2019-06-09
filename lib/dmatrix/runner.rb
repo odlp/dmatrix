@@ -18,7 +18,7 @@ module Dmatrix
       reset_log_dir
 
       results = Parallel.map(combinations, in_threads: 4) do |combination|
-        Executor.new(
+        Executor.build(
           combination: combination,
           run_command: run_command,
           log_dir: log_dir
