@@ -80,25 +80,13 @@ module Dmatrix
     end
 
     def build_args
-      args = combination.aspects.select { |a| a[:type] == "build_arg" }
-
-      if args.empty?
-        return []
-      end
-
-      args.flat_map do |build_arg|
+      combination.build_args.flat_map do |build_arg|
         ["--build-arg", "#{build_arg.name}=#{build_arg.value}"]
       end
     end
 
     def env_args
-      args = combination.aspects.select { |a| a[:type] == "env" }
-
-      if args.empty?
-        return []
-      end
-
-      args.flat_map do |env_arg|
+      combination.env_args.flat_map do |env_arg|
         ["--env", "#{env_arg.name}=#{env_arg.value}"]
       end
     end

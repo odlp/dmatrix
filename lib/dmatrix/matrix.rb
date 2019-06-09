@@ -1,3 +1,5 @@
+require_relative "combination"
+
 module Dmatrix
   class Matrix
     def initialize(input)
@@ -9,7 +11,9 @@ module Dmatrix
 
       input.each do |type, dimension_group|
         dimension_group.each do |(name, values)|
-          dimensions << values.map { |value| Aspect.new(type, name, value) }
+          dimensions << values.map do |value|
+            Combination::Aspect.new(type, name, value)
+          end
         end
       end
 
@@ -21,8 +25,5 @@ module Dmatrix
     private
 
     attr_reader :input
-
-    Combination = Struct.new(:aspects)
-    Aspect = Struct.new(:type, :name, :value)
   end
 end

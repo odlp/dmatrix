@@ -33,6 +33,6 @@ RSpec.describe Dmatrix::Matrix do
   private
 
   def new_aspect(*args)
-    Dmatrix::Matrix::Aspect.new(*args)
+    Dmatrix::Combination::Aspect.new(*args)
   end
 end

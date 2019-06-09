@@ -1,5 +1,5 @@
 require "dmatrix/executor"
-require "dmatrix/matrix"
+require "dmatrix/combination"
 
 RSpec.describe Dmatrix::Executor do
   let(:fake_capture2e) { double("Open::#capture2e", call: exec_result) }
@@ -115,14 +115,14 @@ RSpec.describe Dmatrix::Executor do
   private
 
   def new_combination(env: {}, build_args: {})
-    Dmatrix::Matrix::Combination.new(
+    Dmatrix::Combination.new(
       env.map { |name, value| new_aspect("env", name, value) } +
       build_args.map { |name, value| new_aspect("build_arg", name, value) }
     )
   end
 
   def new_aspect(*args)
-    Dmatrix::Matrix::Aspect.new(*args)
+    Dmatrix::Combination::Aspect.new(*args)
   end
 
   def exec_result(output: "", success: true)
