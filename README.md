@@ -57,8 +57,25 @@ COPY . /app
 bundle exec dmatrix -- bundle exec rspec
 ```
 
-Would use `dmatrix` to build & run `bundle exec rspec` in each combination your
-matrix defines.
+This would use `dmatrix` to build & run `bundle exec rspec` for each combination
+your matrix defines. In your terminal you should see output like this:
+
+```
+my_repo:ruby-2-4-alpine-gemfiles-factory_bot_4_8-gemfile   Build: success  Run: success
+my_repo:ruby-2-4-alpine-gemfiles-factory_bot_5-gemfile     Build: success  Run: success
+my_repo:ruby-2-5-alpine-gemfiles-factory_bot_4_8-gemfile   Build: success  Run: success
+my_repo:ruby-2-5-alpine-gemfiles-factory_bot_5-gemfile     Build: success  Run: success
+my_repo:ruby-2-6-alpine-gemfiles-factory_bot_4_8-gemfile   Build: success  Run: success
+my_repo:ruby-2-6-alpine-gemfiles-factory_bot_5-gemfile     Build: success  Run: success
+```
+
+A build-log and run-log is written per combination in `./tmp/dmatrix`:
+
+```
+build-dmatrix-ruby-2-4-alpine-gemfiles-factory_bot_4_8-gemfile.log
+run-dmatrix-ruby-2-4-alpine-gemfiles-factory_bot_4_8-gemfile.log
+# etc
+```
 
 ## Setup
 
